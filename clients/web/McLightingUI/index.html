@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>McLighting UI</title>
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="shortcut icon" href="https://cdn.rawgit.com/toblum/McLightingUI/1346e334/material/McLightingLogo/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="https://cdn.rawgit.com/toblum/McLightingUI/1346e334/material/McLightingLogo/apple-touch-icon.png">
+
+    <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons"> -->
+  </head>
+  <body>
+    <div id="browser_warning" style="display:none">
+      <h1>Warning</h1>
+      <p>If you see this message, something went wrong. Please keep in mind that McLightingUI doesn't work in Internet Explorer. Please use an upt-to-date browser like Chrome, Firefox or Edge.</p>
+    </div>
+    <script text="text/javascript">
+      if (navigator.userAgent.indexOf('MSIE')!==-1 || navigator.appVersion.indexOf('Trident/') > 0) {
+        console.log("IE detected");
+        document.getElementById("browser_warning").style.display = 'block';
+        document.getElementById("app").style.display = 'hide';
+      }
+    </script>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
