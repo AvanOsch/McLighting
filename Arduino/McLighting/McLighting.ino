@@ -262,7 +262,7 @@ void setup() {
   #endif
   strip.setBrightness(brightness);
   // parameters: index, start, stop, mode, color, speed, reverse
-  strip.setSegment(0,  0,  NUMLEDS-1, FX_MODE_COMET, convertColors(), convertSpeed(ws2812fx_speed), false);
+  strip.setSegment(0,  0,  NUMLEDS-1, FX_MODE_COMET, convertColors(), convertSpeed(ws2812fx_speed), FADE_XSLOW);
   //strip.setSpeed(convertSpeed(ws2812fx_speed));
   //strip.setMode(FX_MODE_RAINBOW_CYCLE);
   //strip.setColor(main_color.red, main_color.green, main_color.blue);
