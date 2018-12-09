@@ -261,9 +261,11 @@ void setup() {
     strip.setCustomShow(DMA_Show);
   #endif
   strip.setBrightness(brightness);
-  strip.setSpeed(convertSpeed(ws2812fx_speed));
+  // parameters: index, start, stop, mode, color, speed, reverse
+  strip.setSegment(0,  0,  NUMLEDS-1, FX_MODE_COMET, convertColors(), convertSpeed(ws2812fx_speed), false);
+  //strip.setSpeed(convertSpeed(ws2812fx_speed));
   //strip.setMode(FX_MODE_RAINBOW_CYCLE);
-  strip.setColor(main_color.red, main_color.green, main_color.blue);
+  //strip.setColor(main_color.red, main_color.green, main_color.blue);
   strip.start();
 
   // ***************************************************************************
@@ -892,7 +894,7 @@ void setup() {
       DBG_OUTPUT_PORT.printf("Found saved state: %s\n", saved_state_string.c_str());
       setModeByStateString(saved_state_string);
     }
-    sprintf(last_state, "STA|%2d|%3d|%3d|%3d|%3d|%3d|%3d", mode, ws2812fx_mode, ws2812fx_speed, brightness, main_color.red, main_color.green, main_color.blue);
+    sprintf(last_state, "STA|%2d|%3d|%3d|%3d|%3d|%3d|%3d|%3d|%3d|%3d|%3d|%3d|%3d", mode, ws2812fx_mode, ws2812fx_speed, brightness, main_color.red, main_color.green, main_color.blue, back_color.red, back_color.green, back_color.blue, xtra_color.red, xtra_color.green, xtra_color.blue);
   #endif
 }
 
@@ -950,7 +952,7 @@ void loop() {
     // mode = HOLD;
   }
   if (mode == SETCOLOR) {
-    strip.setColor(main_color.red, main_color.green, main_color.blue);
+    strip.setColors(0, convertColors());
     strip.trigger();
     mode = (prevmode == SET_MODE) ? SETSPEED : HOLD;
   }
@@ -967,7 +969,7 @@ void loop() {
   }
   #ifdef ENABLE_LEGACY_ANIMATIONS
     if (mode == WIPE) {
-      strip.setColor(main_color.red, main_color.green, main_color.blue);
+      strip.setColors(0, convertColors());
       strip.setMode(FX_MODE_COLOR_WIPE);
       strip.trigger();
       mode = HOLD;
@@ -983,13 +985,13 @@ void loop() {
       mode = HOLD;
     }
     if (mode == THEATERCHASE) {
-      strip.setColor(main_color.red, main_color.green, main_color.blue);
+      strip.setColors(0, convertColors());
       strip.setMode(FX_MODE_THEATER_CHASE);
       strip.trigger();
       mode = HOLD;
     }
     if (mode == TWINKLERANDOM) {
-      strip.setColor(main_color.red, main_color.green, main_color.blue);
+      strip.setColors(0, convertColors());
       strip.setMode(FX_MODE_TWINKLE_RANDOM);
       strip.trigger();
       mode = HOLD;
@@ -1032,7 +1034,7 @@ void loop() {
 
   #ifdef ENABLE_STATE_SAVE_EEPROM
     // Check for state changes
-    sprintf(current_state, "STA|%2d|%3d|%3d|%3d|%3d|%3d|%3d", mode, strip.getMode(), ws2812fx_speed, brightness, main_color.red, main_color.green, main_color.blue);
+    sprintf(current_state, "STA|%2d|%3d|%3d|%3d|%3d|%3d|%3d|%3d|%3d|%3d|%3d|%3d|%3d", mode, strip.getMode(), ws2812fx_speed, brightness, main_color.red, main_color.green, main_color.blue, back_color.red, back_color.green, back_color.blue, xtra_color.red, xtra_color.green, xtra_color.blue);
 
     if (strcmp(current_state, last_state) != 0) {
       // DBG_OUTPUT_PORT.printf("STATE CHANGED: %s / %s\n", last_state, current_state);

@@ -25,4 +25,7 @@
  * - Retire NeoAnimationFX
  * - Use DMA or UART method along with WS2812FX instead
  * - fix #248 
+ * 
+ * 9 Dec 2018 v 2.1.6
+ * - Added support for 2nd and 3rd colors 
  */

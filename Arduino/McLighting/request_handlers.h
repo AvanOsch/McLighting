@@ -23,6 +23,26 @@ void getArgs() {
     main_color.green = server.arg("g").toInt();
     main_color.blue = server.arg("b").toInt();
   }
+  if (server.arg("rgb2") != "") {
+    uint32_t rgb = (uint32_t) strtol(server.arg("rgb2").c_str(), NULL, 16);
+    back_color.red = ((rgb >> 16) & 0xFF);
+    back_color.green = ((rgb >> 8) & 0xFF);
+    back_color.blue = ((rgb >> 0) & 0xFF);
+  } else {
+    back_color.red = server.arg("r2").toInt();
+    back_color.green = server.arg("g2").toInt();
+    back_color.blue = server.arg("b2").toInt();
+  }
+  if (server.arg("rgb3") != "") {
+    uint32_t rgb = (uint32_t) strtol(server.arg("rgb3").c_str(), NULL, 16);
+    xtra_color.red = ((rgb >> 16) & 0xFF);
+    xtra_color.green = ((rgb >> 8) & 0xFF);
+    xtra_color.blue = ((rgb >> 0) & 0xFF);
+  } else {
+    xtra_color.red = server.arg("r3").toInt();
+    xtra_color.green = server.arg("g3").toInt();
+    xtra_color.blue = server.arg("b3").toInt();
+  }
   ws2812fx_speed = constrain(server.arg("s").toInt(), 0, 255);
   if (server.arg("s") == "") {
     ws2812fx_speed = 196;
@@ -41,6 +61,12 @@ void getArgs() {
   main_color.red = constrain(main_color.red, 0, 255);
   main_color.green = constrain(main_color.green, 0, 255);
   main_color.blue = constrain(main_color.blue, 0, 255);
+  back_color.red = constrain(back_color.red, 0, 255);
+  back_color.green = constrain(back_color.green, 0, 255);
+  back_color.blue = constrain(back_color.blue, 0, 255);
+  xtra_color.red = constrain(xtra_color.red, 0, 255);
+  xtra_color.green = constrain(xtra_color.green, 0, 255);
+  xtra_color.blue = constrain(xtra_color.blue, 0, 255);
 
   DBG_OUTPUT_PORT.print("Mode: ");
   DBG_OUTPUT_PORT.print(mode);
@@ -50,6 +76,18 @@ void getArgs() {
   DBG_OUTPUT_PORT.print(main_color.green);
   DBG_OUTPUT_PORT.print(", ");
   DBG_OUTPUT_PORT.print(main_color.blue);
+  DBG_OUTPUT_PORT.print(", Color2: ");
+  DBG_OUTPUT_PORT.print(back_color.red);
+  DBG_OUTPUT_PORT.print(", ");
+  DBG_OUTPUT_PORT.print(back_color.green);
+  DBG_OUTPUT_PORT.print(", ");
+  DBG_OUTPUT_PORT.print(back_color.blue);
+  DBG_OUTPUT_PORT.print(", Color3: ");
+  DBG_OUTPUT_PORT.print(xtra_color.red);
+  DBG_OUTPUT_PORT.print(", ");
+  DBG_OUTPUT_PORT.print(xtra_color.green);
+  DBG_OUTPUT_PORT.print(", ");
+  DBG_OUTPUT_PORT.print(xtra_color.blue);
   DBG_OUTPUT_PORT.print(", Speed:");
   DBG_OUTPUT_PORT.print(ws2812fx_speed);
   DBG_OUTPUT_PORT.print(", Brightness:");
@@ -70,6 +108,26 @@ uint16_t convertSpeed(uint8_t mcl_speed) {
   return ws2812_speed;
 }
 
+uint32_t* convertColors() {
+  DBG_OUTPUT_PORT.print("Colors: ");
+  char rgbmain[9];
+  snprintf(rgbmain, sizeof(rgbmain),"0x%02X%02X%02X",main_color.red,main_color.green,main_color.blue);
+  //uint32_t rgbmain = ((uint32_t)main_color.red << 16) | ((uint32_t)main_color.green << 8) | main_color.blue;
+  DBG_OUTPUT_PORT.print(rgbmain);
+  DBG_OUTPUT_PORT.print(", ");
+  char rgbback[9];
+  snprintf(rgbback, sizeof(rgbback),"0x%02X%02X%02X",back_color.red,back_color.green,back_color.blue);
+  //uint32_t rgbback = ((uint32_t)back_color.red << 16) | ((uint32_t)back_color.green << 8) | back_color.blue;
+  DBG_OUTPUT_PORT.print(rgbback);
+  DBG_OUTPUT_PORT.print(", ");
+  char rgbxtra[9];
+  snprintf(rgbxtra, sizeof(rgbxtra),"0x%02X%02X%02X",xtra_color.red,xtra_color.green,xtra_color.blue);
+  //uint32_t rgbxtra = ((uint32_t)xtra_color.red << 16) | ((uint32_t)xtra_color.green << 8) | xtra_color.blue;
+  DBG_OUTPUT_PORT.println(rgbxtra);
+  uint32_t colors[] = {strtoul(rgbmain, NULL, 16), strtoul(rgbback, NULL, 16), strtoul(rgbxtra, NULL, 16)};
+  DBG_OUTPUT_PORT.println(colors[0]);
+  return colors;
+}
 
 // ***************************************************************************
 // Handler functions for WS and MQTT
@@ -81,6 +139,22 @@ void handleSetMainColor(uint8_t * mypayload) {
   main_color.green = ((rgb >> 8) & 0xFF);
   main_color.blue = ((rgb >> 0) & 0xFF);
 //  strip.setColor(main_color.red, main_color.green, main_color.blue);
+  mode = SETCOLOR;
+}
+void handleSet2ndColor(uint8_t * mypayload) {
+  // decode rgb data
+  uint32_t rgb = (uint32_t) strtol((const char *) &mypayload[2], NULL, 16);
+  back_color.red = ((rgb >> 16) & 0xFF);
+  back_color.green = ((rgb >> 8) & 0xFF);
+  back_color.blue = ((rgb >> 0) & 0xFF);
+  mode = SETCOLOR;
+}
+void handleSet3rdColor(uint8_t * mypayload) {
+  // decode rgb data
+  uint32_t rgb = (uint32_t) strtol((const char *) &mypayload[3], NULL, 16);
+  xtra_color.red = ((rgb >> 16) & 0xFF);
+  xtra_color.green = ((rgb >> 8) & 0xFF);
+  xtra_color.blue = ((rgb >> 0) & 0xFF);
   mode = SETCOLOR;
 }
 
@@ -192,6 +266,18 @@ void setModeByStateString(String saved_state_string) {
   main_color.green = str_green.toInt();
   String str_blue = getValue(saved_state_string, '|', 7);
   main_color.blue = str_blue.toInt();
+  str_red = getValue(saved_state_string, '|', 8);
+  back_color.red = str_red.toInt();
+  str_green = getValue(saved_state_string, '|', 9);
+  back_color.green = str_green.toInt();
+  str_blue = getValue(saved_state_string, '|', 10);
+  back_color.blue = str_blue.toInt();
+  str_red = getValue(saved_state_string, '|', 11);
+  xtra_color.red = str_red.toInt();
+  str_green = getValue(saved_state_string, '|', 12);
+  xtra_color.green = str_green.toInt();
+  str_blue = getValue(saved_state_string, '|', 13);
+  xtra_color.blue = str_blue.toInt();
 
   DBG_OUTPUT_PORT.printf("ws2812fx_mode: %d\n", ws2812fx_mode);
   DBG_OUTPUT_PORT.printf("ws2812fx_speed: %d\n", ws2812fx_speed);
@@ -203,7 +289,7 @@ void setModeByStateString(String saved_state_string) {
   strip.setMode(ws2812fx_mode);
   strip.setSpeed(convertSpeed(ws2812fx_speed));
   strip.setBrightness(brightness);
-  strip.setColor(main_color.red, main_color.green, main_color.blue);
+  strip.setColors(0, convertColors());
 }
 
 #ifdef ENABLE_LEGACY_ANIMATIONS
@@ -289,6 +375,12 @@ String listStatusJSON(void) {
   color.add(main_color.red);
   color.add(main_color.green);
   color.add(main_color.blue);
+  color.add(back_color.red);
+  color.add(back_color.green);
+  color.add(back_color.blue);
+  color.add(xtra_color.red);
+  color.add(xtra_color.green);
+  color.add(xtra_color.blue);
   
   String json;
   serializeJson(root, json);
@@ -393,16 +485,24 @@ void handleAutoStop() {
 }
 
 void checkpayload(uint8_t * payload, bool mqtt = false, uint8_t num = 0) {
-  // # ==> Set main color
+  // # ==> Set main color - ## ==> Set 2nd color - ### ==> Set 3rd color
   if (payload[0] == '#') {
-    handleSetMainColor(payload);
+    if (payload[2] == '#') {
+      handleSet3rdColor(payload);
+      DBG_OUTPUT_PORT.printf("Set 3rd color to: R: [%u] G: [%u] B: [%u]\n",  xtra_color.red, xtra_color.green, xtra_color.blue);
+    } else if (payload[1] == '#') {
+      handleSet2ndColor(payload);
+      DBG_OUTPUT_PORT.printf("Set 2nd color to: R: [%u] G: [%u] B: [%u]\n",  back_color.red, back_color.green, back_color.blue);
+    } else {
+      handleSetMainColor(payload);
+      DBG_OUTPUT_PORT.printf("Set main color to: R: [%u] G: [%u] B: [%u]\n",  main_color.red, main_color.green, main_color.blue);
+    }
     if (mqtt == true)  {
-      DBG_OUTPUT_PORT.print("MQTT: "); 
+      DBG_OUTPUT_PORT.print("MQTT: ");
     } else {
       DBG_OUTPUT_PORT.print("WS: ");
       webSocket.sendTXT(num, "OK");
     }
-    DBG_OUTPUT_PORT.printf("Set main color to: R: [%u] G: [%u] B: [%u]\n",  main_color.red, main_color.green, main_color.blue);
     #ifdef ENABLE_MQTT
       mqtt_client.publish(mqtt_outtopic, String(String("OK ") + String((char *)payload)).c_str());
     #endif
@@ -774,6 +874,12 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
       color["r"] = main_color.red;
       color["g"] = main_color.green;
       color["b"] = main_color.blue;
+      color["r2"] = back_color.red;
+      color["g2"] = back_color.green;
+      color["b2"] = back_color.blue;
+      color["r3"] = xtra_color.red;
+      color["g3"] = xtra_color.green;
+      color["b3"] = xtra_color.blue;
 
       root["brightness"] = brightness;
 
@@ -833,6 +939,12 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
         main_color.red = (uint8_t) color["r"];
         main_color.green = (uint8_t) color["g"];
         main_color.blue = (uint8_t) color["b"];
+        back_color.red = (uint8_t) color["r2"];
+        back_color.green = (uint8_t) color["g2"];
+        back_color.blue = (uint8_t) color["b2"];
+        xtra_color.red = (uint8_t) color["r3"];
+        xtra_color.green = (uint8_t) color["g3"];
+        xtra_color.blue = (uint8_t) color["b3"];
         mode = SETCOLOR;
       }
 
@@ -1264,6 +1376,12 @@ bool writeStateFS(){
   json["red"] = main_color.red;
   json["green"] = main_color.green;
   json["blue"] = main_color.blue;
+  json["red2"] = back_color.red;
+  json["green2"] = back_color.green;
+  json["blue2"] = back_color.blue;
+  json["red3"] = xtra_color.red;
+  json["green3"] = xtra_color.green;
+  json["blue3"] = xtra_color.blue;
 
 //      SPIFFS.remove("/state.json") ? DBG_OUTPUT_PORT.println("removed file") : DBG_OUTPUT_PORT.println("failed removing file");
   File configFile = SPIFFS.open("/stripstate.json", "w");
@@ -1309,11 +1427,17 @@ bool readStateFS() {
         main_color.red = json["red"];
         main_color.green = json["green"];
         main_color.blue = json["blue"];
+        back_color.red = json["red2"];
+        back_color.green = json["green2"];
+        back_color.blue = json["blue2"];
+        xtra_color.red = json["red3"];
+        xtra_color.green = json["green3"];
+        xtra_color.blue = json["blue3"];
 
         strip.setMode(ws2812fx_mode);
         strip.setSpeed(convertSpeed(ws2812fx_speed));
         strip.setBrightness(brightness);
-        strip.setColor(main_color.red, main_color.green, main_color.blue);
+        strip.setColors(0, convertColors());
         
         updateFS = false;
         return true;

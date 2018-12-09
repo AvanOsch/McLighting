@@ -118,12 +118,14 @@ struct ledstate             // Data structure to store a state of a single led
 typedef struct ledstate LEDState;     // Define the datatype LEDState
 LEDState ledstates[NUMLEDS];          // Get an array of led states to store the state of the whole strip
 LEDState main_color = { 255, 0, 0 };  // Store the "main color" of the strip used in single color modes
+LEDState back_color = { 255, 0, 0 };   // Store the "2nd color" of the strip used in single color modes
+LEDState xtra_color = { 255, 0, 0 };   // Store the "3rd color" of the strip used in single color modes
 
 #define ENABLE_STATE_SAVE_SPIFFS        // If defined, saves state on SPIFFS
 //#define ENABLE_STATE_SAVE_EEPROM        // If defined, save state on reboot
 #ifdef ENABLE_STATE_SAVE_EEPROM
-  char current_state[32];               // Keeps the current state representation
-  char last_state[32];                  // Save the last state as string representation
+  char current_state[56];               // Keeps the current state representation
+  char last_state[56];                  // Save the last state as string representation
   unsigned long time_statechange = 0;   // Time when the state last changed
   int timeout_statechange_save = 5000;  // Timeout in ms to wait before state is saved
   bool state_save_requested = false;    // State has to be saved after timeout
@@ -134,9 +136,9 @@ LEDState main_color = { 255, 0, 0 };  // Store the "main color" of the strip use
 
 // Button handling
 #ifdef ENABLE_BUTTON
-  #define BTN_MODE_SHORT "STA| 1|  0|245|196|255|255|255"   // Static white
-  #define BTN_MODE_MEDIUM "STA| 1| 48|245|196|255|102|  0"    // Fire flicker
-  #define BTN_MODE_LONG "STA| 1| 46|253|196|255|102|  0"  // Fireworks random
+  #define BTN_MODE_SHORT "STA| 1|  0|245|196|255|255|255|  0|255|255|  0|255|255"   // Static white
+  #define BTN_MODE_MEDIUM "STA| 1| 48|245|196|255|102|  0|255|255|  0|255|255|  0"    // Fire flicker
+  #define BTN_MODE_LONG "STA| 1| 46|253|196|255|102|  0|255|255|  0|255|255|  0"  // Fireworks random
 
   unsigned long keyPrevMillis = 0;
   const unsigned long keySampleIntervalMs = 25;
