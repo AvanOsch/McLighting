@@ -363,7 +363,7 @@ void handleSetWS2812FXMode(uint8_t * mypayload) {
 String listStatusJSON(void) {
   uint8_t tmp_mode = (mode == SET_MODE) ? (uint8_t) ws2812fx_mode : strip.getMode();
   
-  const size_t bufferSize = JSON_ARRAY_SIZE(3) + JSON_OBJECT_SIZE(6);
+  const size_t bufferSize = JSON_ARRAY_SIZE(9) + JSON_OBJECT_SIZE(6);
   DynamicJsonDocument jsonBuffer(bufferSize);
   JsonObject root = jsonBuffer.to<JsonObject>();
   root["mode"] = (uint8_t) mode;
@@ -865,7 +865,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
     }
 
     void sendState() {
-      const size_t bufferSize = JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(6);
+      const size_t bufferSize = JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(6);
       DynamicJsonDocument jsonBuffer(bufferSize);
       JsonObject root = jsonBuffer.to<JsonObject>();
 
@@ -908,7 +908,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
     }
 
     bool processJson(char* message) {
-      const size_t bufferSize = JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(5) + 150;
+      const size_t bufferSize = JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(5) + 150;
       DynamicJsonDocument jsonBuffer(bufferSize);
       DeserializationError error = deserializeJson(jsonBuffer, message);
       if (error) {
@@ -1367,7 +1367,7 @@ bool writeStateFS(){
   updateFS = true;
   //save the strip state to FS JSON
   DBG_OUTPUT_PORT.print("Saving cfg: ");
-  DynamicJsonDocument jsonBuffer(JSON_OBJECT_SIZE(7));
+  DynamicJsonDocument jsonBuffer(JSON_OBJECT_SIZE(13));
   JsonObject json = jsonBuffer.to<JsonObject>();
   json["mode"] = static_cast<int>(mode);
   json["strip_mode"] = (int) strip.getMode();
@@ -1415,7 +1415,7 @@ bool readStateFS() {
       // Allocate a buffer to store contents of the file.
       std::unique_ptr<char[]> buf(new char[size]);
       configFile.readBytes(buf.get(), size);
-      DynamicJsonDocument jsonBuffer(JSON_OBJECT_SIZE(7)+200);
+      DynamicJsonDocument jsonBuffer(JSON_OBJECT_SIZE(13)+200);
       DeserializationError error = deserializeJson(jsonBuffer, buf.get());
       if (!error) {
         JsonObject json = jsonBuffer.as<JsonObject>();
