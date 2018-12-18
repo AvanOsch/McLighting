@@ -32,11 +32,12 @@ const char HOSTNAME[] = "McLighting01";   // Friedly hostname
 #endif
 
 // parameters for automatically cycling favorite patterns
-uint32_t autoParams[][4] = { // color, speed, mode, duration (seconds)
-  {0xff0000, 200,  1,  5.0}, // blink red for 5 seconds
-  {0x00ff00, 200,  3, 10.0}, // wipe green for 10 seconds
-  {0x0000ff, 200, 11,  5.0}, // dual scan blue for 5 seconds
-  {0x0000ff, 200, 42, 15.0}  // fireworks for 15 seconds
+uint32_t autoParams[][6] = { // color1, color2, color3, speed, mode, duration (seconds)
+  {0xff0000, 0x00ff00, 0x000000, 200,  1,  5.0}, // blink red/geen for 5 seconds
+  {0x00ff00, 0x0000ff, 0x000000, 200,  3, 10.0}, // wipe green/blue for 10 seconds
+  {0x0000ff, 0xff0000, 0x000000, 60, 14,  10.0}, // dual scan blue on red for 10 seconds
+  {0x0000ff, 0xff0000, 0x000000, 40, 45, 15.0},  // fireworks blue/red for 15 seconds
+  {0xff0000, 0x00ff00, 0x0000ff, 40, 54, 15.0}   // tricolor chase red/green/blue for 15 seconds
 };
 
 #if defined(ENABLE_MQTT) or defined(ENABLE_AMQTT)
