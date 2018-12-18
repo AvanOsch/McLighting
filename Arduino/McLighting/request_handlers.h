@@ -125,7 +125,7 @@ uint32_t* convertColors() {
   //uint32_t rgbxtra = ((uint32_t)xtra_color.red << 16) | ((uint32_t)xtra_color.green << 8) | xtra_color.blue;
   DBG_OUTPUT_PORT.println(rgbxtra);
   uint32_t colors[] = {strtoul(rgbmain, NULL, 16), strtoul(rgbback, NULL, 16), strtoul(rgbxtra, NULL, 16)};
-  DBG_OUTPUT_PORT.println(colors[0]);
+  delay(10); // Somehow needed to properly set 3rd color...
   return colors;
 }
 
@@ -462,10 +462,11 @@ Ticker autoTicker;
 int autoCount = 0;
 
 void autoTick() {
-  strip.setColor(autoParams[autoCount][0]);
-  strip.setSpeed(convertSpeed((uint8_t)autoParams[autoCount][1]));
-  strip.setMode((uint8_t)autoParams[autoCount][2]);
-  autoTicker.once((float)autoParams[autoCount][3], autoTick);
+  uint32_t setcolors[] = {autoParams[autoCount][0],autoParams[autoCount][1],autoParams[autoCount][2]};
+  strip.setColors(0, setcolors);
+  strip.setSpeed(convertSpeed((uint8_t)autoParams[autoCount][3]));
+  strip.setMode((uint8_t)autoParams[autoCount][4]);
+  autoTicker.once((float)autoParams[autoCount][5], autoTick);
   DBG_OUTPUT_PORT.print("autoTick ");
   DBG_OUTPUT_PORT.println(autoCount);
 
