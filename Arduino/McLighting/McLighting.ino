@@ -71,6 +71,8 @@ ESP8266HTTPUpdateServer httpUpdater;
 #include <WS2812FX.h>
 WS2812FX strip = WS2812FX(NUMLEDS, PIN, NEO_GRB + NEO_KHZ800);
 
+const uint8_t ws2812fx_options = SIZE_XLARGE + FADE_XSLOW; // WS2812FX setSegment OPTIONS, see: https://github.com/kitesurfer1404/WS2812FX/blob/master/extras/WS2812FX%20Users%20Guide.md
+
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
 // Parameter 3 = pixel type flags, add together as needed:
@@ -261,8 +263,8 @@ void setup() {
     strip.setCustomShow(DMA_Show);
   #endif
   strip.setBrightness(brightness);
-  // parameters: index, start, stop, mode, color, speed, reverse
-  strip.setSegment(0,  0,  NUMLEDS-1, FX_MODE_COMET, convertColors(), convertSpeed(ws2812fx_speed), FADE_XSLOW);
+  // parameters: index, start, stop, mode, color, speed, options
+  strip.setSegment(0,  0,  NUMLEDS-1, FX_MODE_COMET, convertColors(), convertSpeed(ws2812fx_speed), ws2812fx_options);
   //strip.setSpeed(convertSpeed(ws2812fx_speed));
   //strip.setMode(FX_MODE_RAINBOW_CYCLE);
   //strip.setColor(main_color.red, main_color.green, main_color.blue);
