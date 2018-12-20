@@ -109,24 +109,12 @@ uint16_t convertSpeed(uint8_t mcl_speed) {
 }
 
 uint32_t* convertColors() {
-  DBG_OUTPUT_PORT.print("Colors: ");
-  char rgbmain[9];
-  snprintf(rgbmain, sizeof(rgbmain),"0x%02X%02X%02X",main_color.red,main_color.green,main_color.blue);
-  //uint32_t rgbmain = ((uint32_t)main_color.red << 16) | ((uint32_t)main_color.green << 8) | main_color.blue;
-  DBG_OUTPUT_PORT.print(rgbmain);
-  DBG_OUTPUT_PORT.print(", ");
-  char rgbback[9];
-  snprintf(rgbback, sizeof(rgbback),"0x%02X%02X%02X",back_color.red,back_color.green,back_color.blue);
-  //uint32_t rgbback = ((uint32_t)back_color.red << 16) | ((uint32_t)back_color.green << 8) | back_color.blue;
-  DBG_OUTPUT_PORT.print(rgbback);
-  DBG_OUTPUT_PORT.print(", ");
-  char rgbxtra[9];
-  snprintf(rgbxtra, sizeof(rgbxtra),"0x%02X%02X%02X",xtra_color.red,xtra_color.green,xtra_color.blue);
-  //uint32_t rgbxtra = ((uint32_t)xtra_color.red << 16) | ((uint32_t)xtra_color.green << 8) | xtra_color.blue;
-  DBG_OUTPUT_PORT.println(rgbxtra);
-  uint32_t colors[] = {strtoul(rgbmain, NULL, 16), strtoul(rgbback, NULL, 16), strtoul(rgbxtra, NULL, 16)};
-  delay(10); // Somehow needed to properly set 3rd color...
-  return colors;
+  uint32_t rgbmain = (main_color.red << 16) | (main_color.green << 8) | main_color.blue;
+  uint32_t rgbback = (back_color.red << 16) | (back_color.green << 8) | back_color.blue;
+  uint32_t rgbxtra = (xtra_color.red << 16) | (xtra_color.green << 8) | xtra_color.blue;
+  uint32_t color[] = {rgbmain, rgbback, rgbxtra};
+  delay(10); // Somehow needed to set colors properly...
+  return color;
 }
 
 // ***************************************************************************
