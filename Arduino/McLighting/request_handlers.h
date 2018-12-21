@@ -12,6 +12,13 @@ void tickerSpiffsSaveState(){
 }
 #endif
 
+// Call convertColors whenever main_color, back_color or xtra_color changes.
+void convertColors() {
+  hex_colors[0] = (uint32_t)(main_color.red << 16) | (main_color.green << 8) | main_color.blue;
+  hex_colors[1] = (uint32_t)(back_color.red << 16) | (back_color.green << 8) | back_color.blue;
+  hex_colors[2] = (uint32_t)(xtra_color.red << 16) | (xtra_color.green << 8) | xtra_color.blue;
+}
+
 void getArgs() {
   if (server.arg("rgb") != "") {
     uint32_t rgb = (uint32_t) strtol(server.arg("rgb").c_str(), NULL, 16);
@@ -67,6 +74,7 @@ void getArgs() {
   xtra_color.red = constrain(xtra_color.red, 0, 255);
   xtra_color.green = constrain(xtra_color.green, 0, 255);
   xtra_color.blue = constrain(xtra_color.blue, 0, 255);
+  convertColors();
 
   DBG_OUTPUT_PORT.print("Mode: ");
   DBG_OUTPUT_PORT.print(mode);
@@ -108,15 +116,6 @@ uint16_t convertSpeed(uint8_t mcl_speed) {
   return ws2812_speed;
 }
 
-uint32_t* convertColors() {
-  uint32_t rgbmain = (main_color.red << 16) | (main_color.green << 8) | main_color.blue;
-  uint32_t rgbback = (back_color.red << 16) | (back_color.green << 8) | back_color.blue;
-  uint32_t rgbxtra = (xtra_color.red << 16) | (xtra_color.green << 8) | xtra_color.blue;
-  uint32_t color[] = {rgbmain, rgbback, rgbxtra};
-  delay(10); // Somehow needed to set colors properly...
-  return color;
-}
-
 // ***************************************************************************
 // Handler functions for WS and MQTT
 // ***************************************************************************
@@ -126,6 +125,7 @@ void handleSetMainColor(uint8_t * mypayload) {
   main_color.red = ((rgb >> 16) & 0xFF);
   main_color.green = ((rgb >> 8) & 0xFF);
   main_color.blue = ((rgb >> 0) & 0xFF);
+  convertColors();
 //  strip.setColor(main_color.red, main_color.green, main_color.blue);
   mode = SETCOLOR;
 }
@@ -135,6 +135,7 @@ void handleSet2ndColor(uint8_t * mypayload) {
   back_color.red = ((rgb >> 16) & 0xFF);
   back_color.green = ((rgb >> 8) & 0xFF);
   back_color.blue = ((rgb >> 0) & 0xFF);
+  convertColors();
   mode = SETCOLOR;
 }
 void handleSet3rdColor(uint8_t * mypayload) {
@@ -143,6 +144,7 @@ void handleSet3rdColor(uint8_t * mypayload) {
   xtra_color.red = ((rgb >> 16) & 0xFF);
   xtra_color.green = ((rgb >> 8) & 0xFF);
   xtra_color.blue = ((rgb >> 0) & 0xFF);
+  convertColors();
   mode = SETCOLOR;
 }
 
@@ -153,6 +155,7 @@ void handleSetAllMode(uint8_t * mypayload) {
   main_color.red = ((rgb >> 16) & 0xFF);
   main_color.green = ((rgb >> 8) & 0xFF);
   main_color.blue = ((rgb >> 0) & 0xFF);
+  convertColors();
 
   DBG_OUTPUT_PORT.printf("WS: Set all leds to main color: [%u] [%u] [%u]\n", main_color.red, main_color.green, main_color.blue);
   #ifdef ENABLE_LEGACY_ANIMATIONS
@@ -266,6 +269,7 @@ void setModeByStateString(String saved_state_string) {
   xtra_color.green = str_green.toInt();
   str_blue = getValue(saved_state_string, '|', 13);
   xtra_color.blue = str_blue.toInt();
+  convertColors();
 
   DBG_OUTPUT_PORT.printf("ws2812fx_mode: %d\n", ws2812fx_mode);
   DBG_OUTPUT_PORT.printf("ws2812fx_speed: %d\n", ws2812fx_speed);
@@ -277,7 +281,7 @@ void setModeByStateString(String saved_state_string) {
   strip.setMode(ws2812fx_mode);
   strip.setSpeed(convertSpeed(ws2812fx_speed));
   strip.setBrightness(brightness);
-  strip.setColors(0, convertColors());
+  strip.setColors(0, hex_colors);
 }
 
 #ifdef ENABLE_LEGACY_ANIMATIONS
@@ -934,6 +938,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
         xtra_color.red = (uint8_t) color["r3"];
         xtra_color.green = (uint8_t) color["g3"];
         xtra_color.blue = (uint8_t) color["b3"];
+        convertColors();
         mode = SETCOLOR;
       }
 
@@ -950,6 +955,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
         color_temp = (uint16_t) root["color_temp"];
         unsigned int kelvin  = 1000000 / color_temp;
         main_color = temp2rgb(kelvin);
+        convertColors();
         mode = SETCOLOR;
       }
 
@@ -1422,11 +1428,12 @@ bool readStateFS() {
         xtra_color.red = json["red3"];
         xtra_color.green = json["green3"];
         xtra_color.blue = json["blue3"];
+        convertColors();
 
         strip.setMode(ws2812fx_mode);
         strip.setSpeed(convertSpeed(ws2812fx_speed));
         strip.setBrightness(brightness);
-        strip.setColors(0, convertColors());
+        strip.setColors(0, hex_colors);
         
         updateFS = false;
         return true;
