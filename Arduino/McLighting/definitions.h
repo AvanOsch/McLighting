@@ -2,7 +2,7 @@
 //#define USE_WS2812FX_UART     // Uses PIN is ignored & set to D4/GPIO2  Uses WS2812FX, see: https://github.com/kitesurfer1404/WS2812FX
 
 // Neopixel
-#define PIN D1           // PIN (14 / D5) where neopixel / WS2811 strip is attached
+#define PIN 14           // PIN (14 / D5) where neopixel / WS2811 strip is attached
 #define NUMLEDS 24       // Number of leds in the strip
 #define BUILTIN_LED 2    // ESP-12F has the built in LED on GPIO2, see https://github.com/esp8266/Arduino/issues/2192
 #define BUTTON 4         // Input pin (4 / D2) for switching the LED strip on / off, connect this PIN to ground to trigger button.
@@ -108,6 +108,8 @@ int brightness = 196;       // Global variable for storing the brightness (255 =
 int ws2812fx_mode = 0;      // Helper variable to set WS2812FX modes
 
 bool shouldSaveConfig = false;  // For WiFiManger custom config
+
+uint32_t hex_colors[3] = {};  // Color array for setting WS2812FX
 
 struct ledstate             // Data structure to store a state of a single led
 {
