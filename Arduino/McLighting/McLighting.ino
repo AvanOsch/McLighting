@@ -264,7 +264,7 @@ void setup() {
   #endif
   strip.setBrightness(brightness);
   // parameters: index, start, stop, mode, color, speed, options
-  strip.setSegment(0,  0,  NUMLEDS-1, FX_MODE_COMET, convertColors(), convertSpeed(ws2812fx_speed), ws2812fx_options);
+  strip.setSegment(0,  0,  NUMLEDS-1, FX_MODE_COMET, hex_colors, convertSpeed(ws2812fx_speed), ws2812fx_options);
   //strip.setSpeed(convertSpeed(ws2812fx_speed));
   //strip.setMode(FX_MODE_RAINBOW_CYCLE);
   //strip.setColor(main_color.red, main_color.green, main_color.blue);
@@ -954,7 +954,7 @@ void loop() {
     // mode = HOLD;
   }
   if (mode == SETCOLOR) {
-    strip.setColors(0, convertColors());
+    strip.setColors(0, hex_colors);
     strip.trigger();
     mode = (prevmode == SET_MODE) ? SETSPEED : HOLD;
   }
@@ -971,7 +971,7 @@ void loop() {
   }
   #ifdef ENABLE_LEGACY_ANIMATIONS
     if (mode == WIPE) {
-      strip.setColors(0, convertColors());
+      strip.setColors(0, hex_colors);
       strip.setMode(FX_MODE_COLOR_WIPE);
       strip.trigger();
       mode = HOLD;
@@ -987,13 +987,13 @@ void loop() {
       mode = HOLD;
     }
     if (mode == THEATERCHASE) {
-      strip.setColors(0, convertColors());
+      strip.setColors(0, hex_colors);
       strip.setMode(FX_MODE_THEATER_CHASE);
       strip.trigger();
       mode = HOLD;
     }
     if (mode == TWINKLERANDOM) {
-      strip.setColors(0, convertColors());
+      strip.setColors(0, hex_colors);
       strip.setMode(FX_MODE_TWINKLE_RANDOM);
       strip.trigger();
       mode = HOLD;
